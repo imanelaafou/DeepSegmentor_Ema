@@ -26,6 +26,7 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
 
     This function will save images stored in 'visuals' to the HTML file specified by 'webpage'.
     """
+
     image_dir = webpage.get_image_dir()
     short_path = ntpath.basename(image_path[0])
     name = os.path.splitext(short_path)[0]
@@ -39,12 +40,12 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
         save_path = os.path.join(image_dir, image_name)
         h, w, _ = im.shape
         im = Image.fromarray(im)
-        if aspect_ratio > 1.0:
+        if aspect_ratio >= 1.0:
             #im = imresize(im, (h, int(w * aspect_ratio)), interp='bicubic')
-            im = im.resize((int(w * aspect_ratio), h), Image.BICUBIC)
+            im = im.resize((h, w), Image.BICUBIC)
         if aspect_ratio < 1.0:
             #im = imresize(im, (int(h / aspect_ratio), w), interp='bicubic')
-            im = im.resize((w, int(h / aspect_ratio)), Image.BICUBIC)
+            im = im.resize((int(h / aspect_ratio), int(w / aspect_ratio)), Image.BICUBIC)
         im = np.array(im, dtype='uint8')
         util.save_image(im, save_path)
 
@@ -52,8 +53,6 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
         txts.append(label)
         links.append(image_name)
     webpage.add_images(ims, txts, links, width=width)
-
-
 class Visualizer():
     """This class includes several functions that can display/save images and print/save logging information.
 

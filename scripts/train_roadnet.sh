@@ -13,7 +13,7 @@ USE_SELU=0
 NITER=100
 NITER_DECAY=100
 
-python3 train.py \
+python train.py \
   --dataroot ${DATAROOT} \
   --name ${NAME} \
   --model ${MODEL} \

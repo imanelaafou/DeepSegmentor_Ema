@@ -32,16 +32,16 @@ class DeepCrackModel(BaseModel):
         self.visual_names = ['image', 'label_viz', 'fused']
         if self.display_sides:
             self.visual_names += ['side1', 'side2', 'side3', 'side4', 'side5']
-        # specify the models you want to save to the disk. 
+        # specify the models you want to save to the disk.
         self.model_names = ['G']
 
-        # define networks 
-        self.netG = define_deepcrack(opt.input_nc, 
-                                     opt.num_classes, 
-                                     opt.ngf, 
+        # define networks
+        self.netG = define_deepcrack(opt.input_nc,
+                                     opt.num_classes,
+                                     opt.ngf,
                                      opt.norm,
-                                     opt.init_type, 
-                                     opt.init_gain, 
+                                     opt.init_type,
+                                     opt.init_gain,
                                      self.gpu_ids)
 
         self.softmax = torch.nn.Softmax(dim=1)
@@ -52,8 +52,8 @@ class DeepCrackModel(BaseModel):
             #self.criterionSeg = torch.nn.CrossEntropyLoss(weight=self.weight)
             if self.opt.loss_mode == 'focal':
                 self.criterionSeg = BinaryFocalLoss()
-            else: 
-                self.criterionSeg = nn.BCEWithLogitsLoss(size_average=True, reduce=True, 
+            else:
+                self.criterionSeg = torch.nn.BCEWithLogitsLoss(size_average=True, reduce=True,
                     pos_weight=torch.tensor(1.0/3e-2).to(self.device))
             self.weight_side = [0.5, 0.75, 1.0, 0.75, 0.5]
 
@@ -100,10 +100,10 @@ class DeepCrackModel(BaseModel):
         self.loss_side = 0.0
         for out, w in zip(self.outputs[:-1], self.weight_side):
             #self.loss_side += self.criterionSeg(out, self.label3d) * w
-            self.loss_side += self.criterionSeg(out, self.label) * w
+            self.loss_side += self.criterionSeg(out, self.label.float()) * w
 
         #self.loss_fused = self.criterionSeg(self.outputs[-1], self.label3d)
-        self.loss_fused = self.criterionSeg(self.outputs[-1], self.label)
+        self.loss_fused = self.criterionSeg(self.outputs[-1], self.label.float())
         self.loss_total = self.loss_side * lambda_side + self.loss_fused * lambda_fused
         self.loss_total.backward()
 
