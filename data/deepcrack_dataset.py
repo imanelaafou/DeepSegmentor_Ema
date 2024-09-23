@@ -112,13 +112,13 @@ class DeepCrackDataset(BaseDataset):
             img = cv2.resize(img, (w, h), interpolation=cv2.INTER_CUBIC)
             lab = cv2.resize(lab, (w, h), interpolation=cv2.INTER_CUBIC)
         # w, h = self.opt.load_width, self.opt.load_height
+        if hasattr(self.opt, 'aspect_ratio'):
+            w_image, h_image, _ = img.shape
+            resized_w = int(w_image * self.opt.aspect_ratio)
+            resized_h = int(h_image * self.opt.aspect_ratio)
 
-        w_image, h_image, _ = img.shape
-        resized_w = int(w_image * self.opt.aspect_ratio)
-        resized_h = int(h_image * self.opt.aspect_ratio)
-
-        img = cv2.resize(img, (resized_w , resized_h), interpolation=cv2.INTER_CUBIC)
-        lab = cv2.resize(lab, (resized_w, resized_h), interpolation=cv2.INTER_CUBIC)
+            img = cv2.resize(img, (resized_w , resized_h), interpolation=cv2.INTER_CUBIC)
+            lab = cv2.resize(lab, (resized_w, resized_h), interpolation=cv2.INTER_CUBIC)
 
         # binarize segmentation
         _, lab = cv2.threshold(lab, 127, 255, cv2.THRESH_BINARY)
